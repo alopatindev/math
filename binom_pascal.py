@@ -27,7 +27,7 @@ def pascal_formula(ex):
     while i <= ex:
         i += 1
         k = nextLine(k)
-    f = "(a+b)^{%d}=" % ex
+    f = "(a-b)^{%d}=" % ex
     a = ex; b = 0
     for i in range(len(k)):
         #f += "%d*a^%d*b^%d +" % (i, a, b),
@@ -37,7 +37,7 @@ def pascal_formula(ex):
         if b > 0: f += "b"
         if b > 1: f += "^{%d}" % b
         if i < len(k)-1:
-            f += "+"
+            f += "+" if i % 2 else "-"
         a -= 1; b += 1
     return f
 
@@ -48,7 +48,7 @@ def binom(fn, n, k):
 
 def binom_formula(ex):
     fn = factorial(ex)
-    f = "(a+b)^{%d}=" % ex
+    f = "(a-b)^{%d}=" % ex
     for k in range(ex + 1):
         #f += "%da^{%d}b^{%d}+" % (binom(ex, k), ex-k, k)
         bin = binom(fn, ex, k)
@@ -59,7 +59,7 @@ def binom_formula(ex):
         if k > 0: f += "b"
         if k > 1: f += "^{%d}" % k
         if k < ex:
-            f += "+"
+            f += "+" if k % 2 else "-"
     return f
 
 def main():
