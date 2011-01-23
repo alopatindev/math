@@ -2,7 +2,7 @@
 # coding=utf8
 
 # This program calculates (a + b)^n formula using binomial equation or
-# Pascal trangle. Outputs in (La)TeX format.
+# Pascal triangle. Outputs in (La)TeX format.
 
 import sys
 from math import factorial
