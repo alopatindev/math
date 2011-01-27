@@ -11,7 +11,7 @@ a = [[2., 5., 4.],
 
 b = [[30., 150., 110.],]
 
-def multipy(a, b):
+def multiply(a, b):
     n = len(a); m = len(a[0]); k = len(b)
     c = []
 
@@ -76,7 +76,7 @@ def det(a):
         return s
 
 def matrix_method(a, b):
-    return multipy(inverse(a), b)
+    return multiply(inverse(a), b)
 
 def cramer_method(a, b):
     n = len(a); m = len(a[0])
