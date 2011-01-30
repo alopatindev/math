@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # coding=utf8
 
-# This program calculates (a + b)^n formula using binomial equation or
+# This program calculates (a +- b)^n formula using binomial equation or
 # Pascal triangle. Outputs in (La)TeX format.
 
 import sys
@@ -27,7 +27,7 @@ def pascal_formula(ex):
     while i <= ex:
         i += 1
         k = nextLine(k)
-    f = "(a-b)^{%d}=" % ex
+    f = "(a\pm b)^{%d}=" % ex
     a = ex; b = 0
     for i in range(len(k)):
         #f += "%d*a^%d*b^%d +" % (i, a, b),
@@ -37,7 +37,7 @@ def pascal_formula(ex):
         if b > 0: f += "b"
         if b > 1: f += "^{%d}" % b
         if i < len(k)-1:
-            f += "+" if i % 2 else "-"
+            f += "+" if i % 2 else "\pm "
         a -= 1; b += 1
     return f
 
@@ -59,7 +59,7 @@ def binom_formula(ex):
         if k > 0: f += "b"
         if k > 1: f += "^{%d}" % k
         if k < ex:
-            f += "+" if k % 2 else "-"
+            f += "+" if k % 2 else "\pm "
     return f
 
 def main():
