@@ -6,7 +6,8 @@ import tt
 
 if __name__ == '__main__':
     form = cgi.FieldStorage()
-    test = form.getvalue('test')
+    expr = form.getvalue('expr')
+    startwith = form.getvalue('startwith')
     print('Content-Type: text/html; charset=utf-8\n\n')
 
     print('''<!DOCTYPE html>
@@ -14,26 +15,35 @@ if __name__ == '__main__':
 <title>Truth table generator online</title></head>
 <body>''')
 
-    if test:
-        tt.main(['', test, 'html'])
+    if startwith == None:
+        startwith = 1
+
+    if expr:
+        tt.main(['', expr, startwith, 'html'])
         print('<br /><br />')
     else:
-        test = 'x & ~y -> (y + ~x -> ~z)'
+        expr = 'x & ~y -> (y + ~x -> ~z)'
 
     print('''Input an expression:<form action="" method="post">
-<textarea name="test" cols="70" rows="5">
+<textarea name="expr" cols="70" rows="5">
 %s</textarea>
-<input type="submit" value="Do it for me!"></form>''' % test)
+<br/>''' % expr)
+    print('''Start table with:
+<input type="radio" name="startwith" value="1" %s/>1
+<input type="radio" name="startwith" value="0" %s/>0
+<br/>
+<input type="submit" value="Do it for me!"></form>''' % \
+    (startwith and "checked", (startwith == 0) and "checked"))
 
     print('''<hr/>A short help:<br/>
-~ - negative<br/>
+~ - negative (not)<br/>
 & - conjuction (logical multiply)<br/>
 + - disjunction (logical addition)<br/>
 -> - implication (if/then)<br/>
-<-> - equivalence<br/>
+<-> - equivalence (equality)<br/>
 | - NAND gate (Sheffer\'s line)<br/>
 _ - logical NOR (Pirce\'s arrow, Lukachevich\'s line)<br/>
-* - XOR operator.<br/>
+* - XOR operator (exclusive or).<br/>
 <hr/>Coded by Alexander Lopatin. Source code is here:
 <a href="https://github.com/sbar/math/tree/master/logic" target="_blank">
 github.com/sbar/math/tree/master/logic</a>

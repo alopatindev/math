@@ -214,7 +214,8 @@ def pprint(table, html=True):
 
 def main(argv):
     if len(argv) < 2:
-        print('usage: %s \'x & ~y -> (y + ~x -> ~z)\' [html | ascii]' % argv[0])
+        print('usage: %s \'x & ~y -> (y + ~x -> ~z)\' [html | ascii] [1 | 0]' \
+            % argv[0])
         return 1
 
     try:
@@ -225,8 +226,12 @@ def main(argv):
         print('Input error. Check your input expression. More info: %s' % text)
         return 1
 
-    table = make_table(f, operands)
-    pprint(table, len(argv) > 2 and argv[2] == 'html')
+    #pprint(table, len(argv) > 2 and argv[2] == 'html')
+    startwith = (len(argv) > 2 and argv[2] == '1' and 1) or 0
+    html = len(argv) > 3 and argv[3] == 'html'
+
+    table = make_table(f, operands, startwith)
+    pprint(table, html)
 
     t = identic(table)
     if t == 1:
