@@ -12,6 +12,12 @@ if __name__ == '__main__':
 
     print('''<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8" />
+<style>
+<!--
+  tr { background-color: #ffffff }
+  .highlight { background-color: #ffffcc }
+//-->
+</style>
 <title>Truth table generator online</title></head>
 <body>''')
 

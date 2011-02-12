@@ -216,7 +216,8 @@ def pprint(table, html=True):
         print('<table border="1">')
     for i in range(len(table)):
         if html:
-            print('<tr>')
+            print('''<tr onMouseOver="this.className='highlight'" \
+onMouseOut="this.className='normal'">''')
         for j in range(len(table[0])):
             if html:
                 print('<td>%s</td>' % str(table[i][j]))
@@ -235,7 +236,7 @@ def pprint(table, html=True):
 
 def main(argv):
     if len(argv) < 2:
-        print('usage: %s \'x & ~y -> (y + ~x -> ~z)\' [html | ascii] [1 | 0]' \
+        print('usage: %s \'x & ~y -> (y + ~x -> ~z)\' [1 | 0] [html | ascii]' \
             % argv[0])
         return 1
 
