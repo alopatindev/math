@@ -35,5 +35,6 @@ if __name__ == '__main__':
 _ - logical NOR (Pirce\'s arrow, Lukachevich\'s line)<br/>
 * - XOR operator.<br/>
 <hr/>Coded by Alexander Lopatin. Source code is here:
-<a href="https://github.com/sbar/math/logic">github.com/sbar/math/logic</a>
+<a href="https://github.com/sbar/math/tree/master/logic" target="_blank">
+github.com/sbar/math/tree/master/logic</a>
 </body></html>''')
