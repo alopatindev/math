@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-# This program calculates a truth table in html and ascii format.
+# This program calc_binarys a truth table in html and ascii format.
 
 import sys 
 import re
@@ -125,13 +125,28 @@ def lits_to_clean_formula(lits):
         ff = lits
     return ff
 
-def calculate(f, ff, op_dict, op):
+def unary_action(f, ff, op_dict):
+    if f[1].__class__ is list:
+        xx = lits_to_clean_formula(f[1])
+    else:
+        xx = f[1]
+
+    # FIXME: quotes hack
+    if not (xx in op_dict) and xx[:1] == '(' and xx[len(xx)-1] == ')':
+        xx = xx[1::][:len(xx)-2]
+
+    #op_dict[ff] = [int(not i) for i in op_dict[f[1]]]
+    op_dict[ff] = [int(not i) for i in op_dict[xx]]
+
+def calc_binary(f, ff, op_dict, op):
     xx = lits_to_clean_formula(f[0])
     yy = lits_to_clean_formula(f[2])
 
     # FIXME: quotes hack
     if not (xx in op_dict) and xx[:1] == '(' and xx[len(xx)-1] == ')':
         xx = xx[1::][:len(xx)-2]
+    if not (yy in op_dict) and yy[:1] == '(' and yy[len(yy)-1] == ')':
+        yy = yy[1::][:len(yy)-2]
 
     for i in range(len(op_dict[xx])):
         op_dict[ff].append(op(op_dict[xx][i], op_dict[yy][i]))
@@ -144,19 +159,19 @@ def binary_action(f, ff, op_dict):
         f = f[0]
 
     if f[1] == '&':
-        calculate(f, ff, op_dict, lambda x, y: int(x and y))
+        calc_binary(f, ff, op_dict, lambda x, y: int(x and y))
     elif f[1] == '+':
-        calculate(f, ff, op_dict, lambda x, y: int(x or y))
+        calc_binary(f, ff, op_dict, lambda x, y: int(x or y))
     elif f[1] == '->':  # implication
-        calculate(f, ff, op_dict, lambda x, y: int(not(x == 1 and y == 0)))
+        calc_binary(f, ff, op_dict, lambda x, y: int(not(x == 1 and y == 0)))
     elif f[1] == '<->':  # equivalence
-        calculate(f, ff, op_dict, lambda x, y: int(x == y))
+        calc_binary(f, ff, op_dict, lambda x, y: int(x == y))
     elif f[1] == '|':  # NAND gate, Sheffer's line
-        calculate(f, ff, op_dict, lambda x, y: int(not(x and y)))
+        calc_binary(f, ff, op_dict, lambda x, y: int(not(x and y)))
     elif f[1] == '_':  # Logical NOR (Pirce's arrow, Lukachevich's line)
-        calculate(f, ff, op_dict, lambda x, y: int(not(x or y)))
+        calc_binary(f, ff, op_dict, lambda x, y: int(not(x or y)))
     elif f[1] == '*':  # XOR
-        calculate(f, ff, op_dict, lambda x, y: int(x ^ y))
+        calc_binary(f, ff, op_dict, lambda x, y: int(x ^ y))
 
 def solve(f, op_dict, action, table):
     if f.__class__ is list:
@@ -175,7 +190,8 @@ def solve(f, op_dict, action, table):
 
     for i in f:
         if f[0] == '~':
-            op_dict[ff] = [int(not i) for i in op_dict[f[1]]]
+            #op_dict[ff] = [int(not i) for i in op_dict[f[1]]]
+            unary_action(f, ff, op_dict)
         else:
             binary_action(f, ff, op_dict)
 
