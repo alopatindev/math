@@ -129,6 +129,10 @@ def calculate(f, ff, op_dict, op):
     xx = lits_to_clean_formula(f[0])
     yy = lits_to_clean_formula(f[2])
 
+    # FIXME: quotes hack
+    if not (xx in op_dict) and xx[:1] == '(' and xx[len(xx)-1] == ')':
+        xx = xx[1::][:len(xx)-2]
+
     for i in range(len(op_dict[xx])):
         op_dict[ff].append(op(op_dict[xx][i], op_dict[yy][i]))
 
@@ -207,10 +211,11 @@ def pprint(table, html=True):
                     sys.stdout.write('? |')
         if html:
             print('</tr>\n')
-            print('</table>')
         else:
             print()
             sys.stdout.flush()
+    if html:
+        print('</table>')
 
 def main(argv):
     if len(argv) < 2:
