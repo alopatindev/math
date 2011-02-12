@@ -207,10 +207,10 @@ def pprint(table, html=True):
                     sys.stdout.write('? |')
         if html:
             print('</tr>\n')
+            print('</table>')
         else:
             print()
             sys.stdout.flush()
-    print('</table>')
 
 def main(argv):
     if len(argv) < 2:
