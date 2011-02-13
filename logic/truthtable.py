@@ -74,8 +74,6 @@ def formula(s):
 
     # fix priority (& — before everything, + before -> and <->)
     quote_unary(lits, '~')
-    quote_binary(lits, '&')
-    quote_binary(lits, '+')
     for i in '|_&+':
         quote_binary(lits, i)
 
