@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-# This program calc_binarys a truth table in html and ascii format.
+# This program calculates a truth table in html and ascii format.
 
 import sys 
 import re
@@ -33,16 +33,28 @@ def formula(s):
                 expr(lits, j, operands)
         if lits[j] == ')':
             lits.pop(j)  # removing )
-        lits.insert(i, ex) 
+        lits.insert(i, ex)
+
+    def quote_unary(lits, operator):
+        i = 0
+        while i < len(lits):
+            if lits[i].__class__ is list:
+                lits[i] = quote_unary(lits[i], operator)
+            elif lits[i] == operator:
+                lits[i] = [lits[i], lits[i+1]]
+                lits.pop(i+1)
+            i += 1
+
+        return lits
 
     def quote_unary(lits, operator):
         i = 0
         while i < len(lits):
             if lits[i].__class__ is list:
                 quote_unary(lits[i], operator)
-            elif lits[i] == operator:
-                lits[i] = [lits[i], lits[i+1]]
-                lits.pop(i+1)
+            elif len(lits) > 2 and lits[i] == operator:
+                quote_unary(lits[i+1], operator)
+                lits[i] = [operator, lits.pop(i+1)]
             i += 1
 
     def quote_binary(lits, operator):
@@ -50,7 +62,7 @@ def formula(s):
         while i < len(lits):
             if lits[i].__class__ == list:
                 quote_binary(lits[i], operator)
-            elif lits[i] == operator:
+            elif len(lits) > 3 and lits[i] == operator:
                 lits[i] = [lits[i-1], operator, lits[i+1]]
                 lits.pop(i-1)  # removing old operands
                 lits.pop(i)
@@ -64,8 +76,8 @@ def formula(s):
 
     # fix priority (& — before everything, + before -> and <->)
     quote_unary(lits, '~')
-    #quote_binary(lits, '&')
-    #quote_binary(lits, '+')
+    quote_binary(lits, '&')
+    quote_binary(lits, '+')
     for i in '|_&+':
         quote_binary(lits, i)
 
@@ -131,32 +143,17 @@ def unary_action(f, ff, op_dict):
     else:
         xx = f[1]
 
-    # FIXME: quotes hack
-    if not (xx in op_dict) and xx[:1] == '(' and xx[len(xx)-1] == ')':
-        xx = xx[1::][:len(xx)-2]
-
-    #op_dict[ff] = [int(not i) for i in op_dict[f[1]]]
     op_dict[ff] = [int(not i) for i in op_dict[xx]]
 
 def calc_binary(f, ff, op_dict, op):
     xx = lits_to_clean_formula(f[0])
     yy = lits_to_clean_formula(f[2])
 
-    # FIXME: quotes hack
-    if not (xx in op_dict) and xx[:1] == '(' and xx[len(xx)-1] == ')':
-        xx = xx[1::][:len(xx)-2]
-    if not (yy in op_dict) and yy[:1] == '(' and yy[len(yy)-1] == ')':
-        yy = yy[1::][:len(yy)-2]
-
     for i in range(len(op_dict[xx])):
         op_dict[ff].append(op(op_dict[xx][i], op_dict[yy][i]))
 
 def binary_action(f, ff, op_dict):
     op_dict[ff] = []
-
-    # FIXME: hack with removing quotes
-    while len(f) == 1:
-        f = f[0]
 
     if f[1] == '&':
         calc_binary(f, ff, op_dict, lambda x, y: int(x and y))
@@ -183,14 +180,8 @@ def solve(f, op_dict, action, table):
     #print('%d. ' % action, f)
     #print('%s' % ff, f)  # shows the actions in order to do
 
-    # FIXME: hack with removing quotes
-    if len(f) == 1:
-        f = f[0]
-        return action
-
     for i in f:
         if f[0] == '~':
-            #op_dict[ff] = [int(not i) for i in op_dict[f[1]]]
             unary_action(f, ff, op_dict)
         else:
             binary_action(f, ff, op_dict)
@@ -248,7 +239,6 @@ def main(argv):
         print('Input error. Check your input expression. More info: %s' % text)
         return 1
 
-    #pprint(table, len(argv) > 2 and argv[2] == 'html')
     startwith = (len(argv) > 2 and argv[2] == '1' and 1) or 0
     html = len(argv) > 3 and argv[3] == 'html'
 

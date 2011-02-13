@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import cgi
-import tt
+import truthtable
 
 if __name__ == '__main__':
     form = cgi.FieldStorage()
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         startwith = 1
 
     if expr:
-        tt.main(['', expr, startwith, 'html'])
+        truthtable.main(['', expr, startwith, 'html'])
         print('<br /><br />')
     else:
         expr = 'x & ~y -> (y + ~x -> ~z)'
