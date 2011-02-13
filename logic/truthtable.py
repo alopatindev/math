@@ -12,7 +12,7 @@
 import sys 
 import re
 
-lits_r = re.compile(r'([~&+|_*()]|[a-zA-Z]|<->|->)')
+lits_r = re.compile(r'([a-zA-Z]|[~&+|_*()]|<->|->)')
 MAX_SYMBOLS = 1000
 
 def is_operand(x):
@@ -23,12 +23,13 @@ def fix_input(s):
     if len(s) > MAX_SYMBOLS:
         raise Exception('input line is too long')
     k = s[0]
-    i = 1
-    while i < len(s)-1:
+    i = 0
+    while i < len(s) and not(i == len(s) and is_operand(k)):
         if s[i] == '(' or s[i] == ')':
+            i += 1
             continue
-        if is_operand(s[i]) and is_operand(k):
-            s = s[:i+1] + '&' + s[i+1:]
+        elif is_operand(s[i]) and is_operand(k) and i != 0:
+            s = s[:i] + '&' + s[i:]
         k = s[i]
         i += 1
     return s
