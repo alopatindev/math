@@ -15,17 +15,32 @@ import re
 lits_r = re.compile(r'([~&+|_*()]|[a-zA-Z]|<->|->)')
 MAX_SYMBOLS = 1000
 
-def formula(s):
+def is_operand(x):
+    return 'a' <= x <= 'z' or 'A' <= x <= 'Z'
+
+def fix_input(s):
     s = s.replace(' ', '').replace('~~', '').replace('\r','').replace('\n', '')
     if len(s) > MAX_SYMBOLS:
         raise Exception('input line is too long')
+    k = s[0]
+    i = 1
+    while i < len(s)-1:
+        if s[i] == '(' or s[i] == ')':
+            continue
+        if is_operand(s[i]) and is_operand(k):
+            s = s[:i+1] + '&' + s[i+1:]
+        k = s[i]
+        i += 1
+    return s
+
+def formula(s):
+    s = fix_input(s)
 
     lits = lits_r.findall(s)
     operands = []
 
     for i in lits:
-        if ('a' <= i <= 'z' or 'A' <= i <= 'Z') and \
-            not operands.__contains__(i):
+        if is_operand(i) and not operands.__contains__(i):
             operands.append(i)
 
     def expr(lits, i, operands): 
@@ -61,6 +76,7 @@ def formula(s):
                 lits[i] = [operator, lits.pop(i+1)]
             i += 1
 
+    # FIXME: a&b&c — quotes wrong
     def quote_binary(lits, operator):
         i = 0
         while i < len(lits):
