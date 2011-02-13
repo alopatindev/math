@@ -67,7 +67,7 @@ def formula(s):
                 lits[i] = [operator, lits.pop(i+1)]
             i += 1
 
-    # FIXME: a&b&c — quotes wrong
+    # FIXME: x&y&x+x — quotes wrong
     def quote_binary(lits, operator):
         i = 0
         while i < len(lits):
