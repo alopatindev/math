@@ -39,13 +39,11 @@ def formula(s):
         i = 0
         while i < len(lits):
             if lits[i].__class__ is list:
-                lits[i] = quote_unary(lits[i], operator)
+                quote_unary(lits[i], operator)
             elif lits[i] == operator:
                 lits[i] = [lits[i], lits[i+1]]
                 lits.pop(i+1)
             i += 1
-
-        return lits
 
     def quote_unary(lits, operator):
         i = 0
