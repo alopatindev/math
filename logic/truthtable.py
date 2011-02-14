@@ -18,6 +18,9 @@ MAX_SYMBOLS = 1000
 def is_operand(x):
     return 'a' <= x <= 'z' or 'A' <= x <= 'Z'
 
+def is_operator(x):
+    return not is_operand(x)
+
 def fix_input(s):
     s = s.replace(' ', '').replace('~~', '').replace('\r','').replace('\n', '')
     if len(s) > MAX_SYMBOLS:
@@ -67,19 +70,23 @@ def formula(s):
                 lits[i] = [operator, lits.pop(i+1)]
             i += 1
 
-    # FIXME: (z+z)*a*a - quotes wrong
+    # FIXME: ab(ab) - quotes wrong
     def quote_binary(lits, operator):
         i = 0
+        another = False  # we've met a different operator than we're lookin' for
         while i < len(lits):
             if lits[i].__class__ == list:
                 quote_binary(lits[i], operator)
-            elif len(lits) > 3 and lits[i] == operator:
-                j = i
-                while j < len(lits) and lits[j] == operator:
-                    j += 2
-                lits[i-1] = [lits[k] for k in range(i-1, j)]
-                for k in range(i, j):
-                    lits.pop(i)
+            else:
+                if lits[i] == operator:
+                    if i < len(lits)-1-(not another):
+                        lits[i-1] = [lits[i-1], lits[i], lits[i+1]]
+                        lits.pop(i)
+                        lits.pop(i)
+                        i -= 1
+                else:
+                    another |= is_operator(lits[i])
+
             i += 1
 
     i = 0
@@ -90,7 +97,7 @@ def formula(s):
 
     # fix priority (& — before everything, + before -> and <->)
     quote_unary(lits, '~')
-    for i in '|_&+':
+    for i in ('|', '_', '&', '+', '*', '->', '<->'):
         quote_binary(lits, i)
 
     operands.sort()
