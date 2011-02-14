@@ -58,7 +58,18 @@ def formula(s):
                 expr(lits, j, operands)
         if lits[j] == ')':
             lits.pop(j)  # removing )
-        lits.insert(i, ex)
+
+        # remove unnecessary brackets
+        if len(ex) == 1:
+            ex = ex[0]
+
+        # remove brackets in "ab(ab)" expressions
+        if is_operator(ex[0]) and ex[0] != '~':
+            for j in ex:
+                lits.insert(i, j)
+                i += 1
+        else:
+            lits.insert(i, ex)
 
     def quote_unary(lits, operator):
         i = 0
@@ -70,7 +81,6 @@ def formula(s):
                 lits[i] = [operator, lits.pop(i+1)]
             i += 1
 
-    # FIXME: ab(ab) - quotes wrong
     def quote_binary(lits, operator):
         i = 0
         another = False  # we've met a different operator than we're lookin' for
