@@ -67,16 +67,19 @@ def formula(s):
                 lits[i] = [operator, lits.pop(i+1)]
             i += 1
 
-    # FIXME: x&y&x+x — quotes wrong
+    # FIXME: (z+z)*a*a - quotes wrong
     def quote_binary(lits, operator):
         i = 0
         while i < len(lits):
             if lits[i].__class__ == list:
                 quote_binary(lits[i], operator)
             elif len(lits) > 3 and lits[i] == operator:
-                lits[i] = [lits[i-1], operator, lits[i+1]]
-                lits.pop(i-1)  # removing old operands
-                lits.pop(i)
+                j = i
+                while j < len(lits) and lits[j] == operator:
+                    j += 2
+                lits[i-1] = [lits[k] for k in range(i-1, j)]
+                for k in range(i, j):
+                    lits.pop(i)
             i += 1
 
     i = 0
