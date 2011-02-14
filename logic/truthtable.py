@@ -21,10 +21,25 @@ def is_operand(x):
 def is_operator(x):
     return not is_operand(x)
 
+def brackets_ok(s):
+    br = []
+    for i in s:
+        if i == '(':
+            br.append(i)
+        elif i == ')':
+            if len(br) == 0 or br.pop() != '(':
+                return False
+    return len(br) == 0
+
 def fix_input(s):
     s = s.replace(' ', '').replace('~~', '').replace('\r','').replace('\n', '')
     if len(s) > MAX_SYMBOLS:
         raise Exception('input line is too long')
+
+    if not brackets_ok(s):
+        raise Exception('input line has some wrong brackets order')
+
+    # autoquote abc with conjuction
     k = s[0]
     i = 0
     while i < len(s) and not(i == len(s) and is_operand(k)):
@@ -81,6 +96,7 @@ def formula(s):
                 lits[i] = [operator, lits.pop(i+1)]
             i += 1
 
+    # FIXME: wrong with "a(bc+a)"
     def quote_binary(lits, operator):
         i = 0
         another = False  # we've met a different operator than we're lookin' for
