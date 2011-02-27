@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-# This program calculates binary relations. R with S, R^n, R^+, R^*.
+# This program calculates the next binary relations compositions:
+# R with S, R^n, R^+, R^*, R^(-1).
 # Copyright (C) 2011 Alexander Lopatin
 #
 # This program is free software: you can redistribute it and/or modify
@@ -11,19 +12,19 @@
 
 from copy import copy
 
-#a = [[0, 0, 1, 0],
-#     [0, 0, 1, 0],
-#     [0, 0, 0, 0],
-#     [0, 1, 0, 0]]
+a = [[0, 0, 1, 0],
+     [0, 0, 1, 0],
+     [0, 0, 0, 0],
+     [0, 1, 0, 0]]
 
-#b = [[1, 0, 0, 0],
-#     [0, 0, 1, 0],
-#     [0, 0, 0, 1],
-#     [1, 0, 0, 0]]
+b = [[1, 0, 0, 0],
+     [0, 0, 1, 0],
+     [0, 0, 0, 1],
+     [1, 0, 0, 0]]
 
-a = [[1, 0, 1],
-     [0, 0, 1],
-     [1, 0, 0]]
+#a = [[1, 0, 1],
+#     [0, 0, 1],
+#     [1, 0, 0]]
 
 def multiply(a, b):
     res = []
@@ -81,9 +82,14 @@ def powStar(a):
     n = len(a)
     return add(identMatrix(n), powPlusWarshall(a))
 
-#print(multiply(a, b))
-#print(pow(a, 2))
-print(powPlusWarshall(a))
-print(powPlus(a))
-print(powStar(a))
-#print(identityMatrix(3))
+# calculates R^(-1)
+def transp(a):
+    n = len(a)
+    return [[a[j][i] for j in range(n)] for i in range(n)]
+
+print("R with S =", multiply(a, b))
+print("R^2 =",pow(a, 2))
+print("R^+ =", powPlusWarshall(a))
+print("R^+ =", powPlus(a))
+print("R^* =", powStar(a))
+print("R^(-1) = R^T =", transp(a))
