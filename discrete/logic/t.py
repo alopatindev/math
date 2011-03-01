@@ -21,7 +21,7 @@ if __name__ == '__main__':
 <title>Truth table generator online</title></head>
 <body>''')
 
-    if startwith not in '01':
+    if startwith.__class__ != str or startwith not in '01':
         startwith = '1'
 
     if expr:
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 <br/>
 <input type="submit" value="Do it for me!"></form>''' % \
         ((startwith == '1' and 'checked ') or '',
-        ((startwith == '0') and 'checked ') or '')
+         (startwith == '0' and 'checked ') or '')
     )
 
     print('''<hr/>A short help:<br/>
