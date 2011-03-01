@@ -21,8 +21,8 @@ if __name__ == '__main__':
 <title>Truth table generator online</title></head>
 <body>''')
 
-    if startwith == None:
-        startwith = 1
+    if startwith not in '01':
+        startwith = '1'
 
     if expr:
         truthtable.main(['', expr, startwith, 'html'])
@@ -39,7 +39,9 @@ if __name__ == '__main__':
 <input type="radio" name="startwith" value="0" %s/>0
 <br/>
 <input type="submit" value="Do it for me!"></form>''' % \
-    (startwith and "checked", (startwith == 0) and "checked"))
+        ((startwith == '1' and 'checked ') or '',
+        ((startwith == '0') and 'checked ') or '')
+    )
 
     print('''<hr/>A short help:<br/>
 ~ - negative (not)<br/>
