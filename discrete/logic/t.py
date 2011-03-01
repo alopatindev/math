@@ -30,7 +30,7 @@ if __name__ == '__main__':
     else:
         expr = 'x & ~y -> (y + ~x -> ~z)'
 
-    print('''Input an expression:<form action="" method="post">
+    print('''Input an expression:<form action="" method="get">
 <textarea name="expr" cols="70" rows="5">
 %s</textarea>
 <br/>''' % expr)
