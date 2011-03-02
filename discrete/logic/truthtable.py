@@ -104,7 +104,6 @@ def formula(s):
                 lits[i] = [operator, lits.pop(i+1)]
             i += 1
 
-    # FIXME: wrong with "a(bc+a)"
     def quote_binary(lits, operator):
         i = 0
         another = False  # we've met a different operator than we're lookin' for
@@ -292,7 +291,7 @@ def main(argv):
     try:
         s = fix_input(argv[1])
         f, operands = formula(s)
-        print('Processing formula "%s"' % s)
+        print('Processing formula "%s"' % lits_to_clean_formula(f))
 
         startwith = (len(argv) > 2 and argv[2] == '1' and 1) or 0
         html = len(argv) > 3 and argv[3] == 'html'
