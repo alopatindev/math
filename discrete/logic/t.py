@@ -50,7 +50,7 @@ if __name__ == '__main__':
 -> - implication (if/then)<br/>
 <-> - equivalence (equality)<br/>
 | - NAND gate (Sheffer\'s line)<br/>
-_ - logical NOR (Pirce\'s arrow, Lukachevich\'s line)<br/>
+_ - logical NOR (Pirce\'s arrow, Lukasevich\'s line)<br/>
 * - XOR operator (exclusive or).<br/>
 <hr/>Coded by Alexander Lopatin. Source code is here:
 <a href="https://github.com/sbar/math/tree/master/discrete/logic"
