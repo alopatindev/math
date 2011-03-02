@@ -293,17 +293,18 @@ def main(argv):
         s = fix_input(argv[1])
         f, operands = formula(s)
         print('Processing formula "%s"' % s)
+
+        startwith = (len(argv) > 2 and argv[2] == '1' and 1) or 0
+        html = len(argv) > 3 and argv[3] == 'html'
+
+        table = make_table(f, operands, startwith)
+        pprint(table, html)
+
+        t = identic(table)
     except Exception as text:
         print('Input error. Check your input expression. More info: %s' % text)
         return 1
 
-    startwith = (len(argv) > 2 and argv[2] == '1' and 1) or 0
-    html = len(argv) > 3 and argv[3] == 'html'
-
-    table = make_table(f, operands, startwith)
-    pprint(table, html)
-
-    t = identic(table)
     if t == 1:
         print('Expression is tautology')
     elif t == 0:
