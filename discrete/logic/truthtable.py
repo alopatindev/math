@@ -21,6 +21,9 @@ def is_operand(x):
 def is_operator(x):
     return not is_operand(x)
 
+def is_unary_operator(x):
+    return x == '~'
+
 def brackets_ok(s):
     br = []
     for i in s:
@@ -37,7 +40,7 @@ def fix_input(s):
         raise Exception('input line is too long')
 
     if not brackets_ok(s):
-        raise Exception('input line has some wrong brackets order')
+        raise Exception('check your brackets')
 
     # autoquote abc with conjuction
     k = s[0]
@@ -46,15 +49,17 @@ def fix_input(s):
         if s[i] == '(' or s[i] == ')':
             i += 1
             continue
-        elif is_operand(s[i]) and is_operand(k) and i != 0:
+        elif i > 1 and is_unary_operator(k) \
+                   and is_operand(s[i-2]) and is_operand(s[i]):
+            s = s[:i-1] + '&' + s[i-1:]
+        elif i != 0 and is_operand(s[i]) and is_operand(k):
             s = s[:i] + '&' + s[i:]
         k = s[i]
         i += 1
+
     return s
 
 def formula(s):
-    s = fix_input(s)
-
     lits = lits_r.findall(s)
     operands = []
 
@@ -226,7 +231,7 @@ def solve(f, op_dict, action, table):
     #print('%s' % ff, f)  # shows the actions in order to do
 
     for i in f:
-        if f[0] == '~':
+        if is_unary_operator(f[0]):
             unary_action(f, ff, op_dict)
         else:
             binary_action(f, ff, op_dict)
@@ -277,7 +282,7 @@ def main(argv):
         return 1
 
     try:
-        s = argv[1]
+        s = fix_input(argv[1])
         f, operands = formula(s)
         print('Processing formula "%s"' % s)
     except Exception as text:
