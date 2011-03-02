@@ -12,11 +12,14 @@
 import sys 
 import re
 
-lits_r = re.compile(r'([a-zA-Z]|[~&+|_*()]|<->|->)')
+lits_r = re.compile(r'([a-zA-Z01]|[~&+|_*()]|<->|->)')
 MAX_SYMBOLS = 1000
 
+def is_const(x):
+    return x in '01'
+
 def is_operand(x):
-    return 'a' <= x <= 'z' or 'A' <= x <= 'Z'
+    return 'a' <= x <= 'z' or 'A' <= x <= 'Z' or is_const(x)
 
 def is_operator(x):
     return not is_operand(x)
@@ -64,7 +67,7 @@ def formula(s):
     operands = []
 
     for i in lits:
-        if is_operand(i) and not operands.__contains__(i):
+        if is_operand(i) and not is_const(i) and not operands.__contains__(i):
             operands.append(i)
 
     def expr(lits, i, operands): 
@@ -157,7 +160,7 @@ def make_table(f, operands, startwith = 1):
 
         l //= 2
 
-    solve(f, op_dict, 0, table)
+    solve(f, op_dict, 0, table, lines)
 
     for j in range(len(table[0])):
         for i in range(len(op_dict[table[0][j]])):
@@ -187,44 +190,49 @@ def lits_to_clean_formula(lits):
         ff = lits
     return ff
 
-def unary_action(f, ff, op_dict):
+def unary_action(f, ff, op_dict, lines):
     if f[1].__class__ is list:
         xx = lits_to_clean_formula(f[1])
     else:
         xx = f[1]
 
-    op_dict[ff] = [int(not i) for i in op_dict[xx]]
+    if is_const(xx):
+        op_dict[ff] = [int(not int(xx)) for i in range(lines)]
+    else:
+        op_dict[ff] = [int(not i) for i in op_dict[xx]]
 
-def calc_binary(f, ff, op_dict, op):
+def calc_binary(f, ff, op_dict, n, op):
     xx = lits_to_clean_formula(f[0])
     yy = lits_to_clean_formula(f[2])
 
-    for i in range(len(op_dict[xx])):
-        op_dict[ff].append(op(op_dict[xx][i], op_dict[yy][i]))
+    for i in range(n):
+        x = int(xx) if is_const(xx) else op_dict[xx][i]
+        y = int(yy) if is_const(yy) else op_dict[yy][i]
+        op_dict[ff].append(op(x, y))
 
-def binary_action(f, ff, op_dict):
+def binary_action(f, ff, op_dict, n):
     op_dict[ff] = []
 
     if f[1] == '&':
-        calc_binary(f, ff, op_dict, lambda x, y: int(x and y))
+        calc_binary(f, ff, op_dict, n, lambda x, y: int(x and y))
     elif f[1] == '+':
-        calc_binary(f, ff, op_dict, lambda x, y: int(x or y))
+        calc_binary(f, ff, op_dict, n, lambda x, y: int(x or y))
     elif f[1] == '->':  # implication
-        calc_binary(f, ff, op_dict, lambda x, y: int(not(x == 1 and y == 0)))
+        calc_binary(f, ff, op_dict, n, lambda x, y: int(not(x == 1 and y == 0)))
     elif f[1] == '<->':  # equivalence
-        calc_binary(f, ff, op_dict, lambda x, y: int(x == y))
+        calc_binary(f, ff, op_dict, n, lambda x, y: int(x == y))
     elif f[1] == '|':  # NAND gate, Sheffer's line
-        calc_binary(f, ff, op_dict, lambda x, y: int(not(x and y)))
+        calc_binary(f, ff, op_dict, n, lambda x, y: int(not(x and y)))
     elif f[1] == '_':  # Logical NOR (Pirce's arrow, Lukachevich's line)
-        calc_binary(f, ff, op_dict, lambda x, y: int(not(x or y)))
+        calc_binary(f, ff, op_dict, n, lambda x, y: int(not(x or y)))
     elif f[1] == '*':  # XOR
-        calc_binary(f, ff, op_dict, lambda x, y: int(x ^ y))
+        calc_binary(f, ff, op_dict, n, lambda x, y: int(x ^ y))
 
-def solve(f, op_dict, action, table):
+def solve(f, op_dict, action, table, lines):
     if f.__class__ is list:
         for i in f:
             if i.__class__ is list:
-                action = solve(i, op_dict, action, table)
+                action = solve(i, op_dict, action, table, lines)
 
     ff = lits_to_clean_formula(f)
     #print('%d. ' % action, f)
@@ -232,9 +240,9 @@ def solve(f, op_dict, action, table):
 
     for i in f:
         if is_unary_operator(f[0]):
-            unary_action(f, ff, op_dict)
+            unary_action(f, ff, op_dict, lines)
         else:
-            binary_action(f, ff, op_dict)
+            binary_action(f, ff, op_dict, lines)
 
     table[0].append(ff)
 
