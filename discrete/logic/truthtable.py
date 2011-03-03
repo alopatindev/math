@@ -212,6 +212,8 @@ def calc_binary(f, ff, op_dict, n, op):
 
 def binary_action(f, ff, op_dict, n):
     op_dict[ff] = []
+    if len(f) < 2:
+        print("wtf", f, ff)
 
     if f[1] == '&':
         calc_binary(f, ff, op_dict, n, lambda x, y: int(x and y))
@@ -242,7 +244,10 @@ def solve(f, op_dict, action, table, lines):
         if is_unary_operator(f[0]):
             unary_action(f, ff, op_dict, lines)
         else:
-            binary_action(f, ff, op_dict, lines)
+            if len(f) > 1:
+                binary_action(f, ff, op_dict, lines)
+            else:
+                return action + 1
 
     table[0].append(ff)
 
