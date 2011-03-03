@@ -105,7 +105,6 @@ def formula(s):
                         i -= 1
                 else:
                     another |= is_operator(lits[i])
-
             i += 1
 
     def autoconjuction(lits):
@@ -258,8 +257,13 @@ def identic(table):
             tautology = False
         if table[j][m-1] == 1 and absurdity:
             absurdity = False
-
-    return 1 if tautology else 0 if absurdity else -1
+    #return 1 if tautology else 0 if absurdity else -1
+    if tautology:
+        return 'Expression is tautology'
+    elif absurdity:
+        return 'Expression is absurdity'
+    else:
+        return 'Expression is not identical'
 
 def pprint(table, html=True):
     if html:
@@ -300,18 +304,10 @@ def main(argv):
 
         table = make_table(f, operands, startwith)
         pprint(table, html)
-
-        t = identic(table)
+        print(identic(table))
     except Exception as text:
         print('Input error. Check your input expression. More info: %s' % text)
         return 1
-
-    if t == 1:
-        print('Expression is tautology')
-    elif t == 0:
-        print('Expression is absurdity')
-    else:
-        print('Expression is not identical')
 
     return 0
 
