@@ -19,7 +19,8 @@ def is_const(x):
     return x in '01'
 
 def is_operand(x):
-    return 'a' <= x <= 'z' or 'A' <= x <= 'Z' or is_const(x)
+    return x.__class__ is str and \
+           ('a' <= x <= 'z' or 'A' <= x <= 'Z' or is_const(x))
 
 def is_operator(x):
     return not is_operand(x)
@@ -44,21 +45,6 @@ def fix_input(s):
 
     if not brackets_ok(s):
         raise Exception('check your brackets')
-
-    # autoquote abc with conjuction
-    k = s[0]
-    i = 0
-    while i < len(s) and not(i == len(s) and is_operand(k)):
-        if s[i] == '(' or s[i] == ')':
-            i += 1
-            continue
-        elif i > 1 and is_unary_operator(k) \
-                   and is_operand(s[i-2]) and is_operand(s[i]):
-            s = s[:i-1] + '&' + s[i-1:]
-        elif i != 0 and is_operand(s[i]) and is_operand(k):
-            s = s[:i] + '&' + s[i:]
-        k = s[i]
-        i += 1
 
     return s
 
@@ -87,7 +73,7 @@ def formula(s):
             ex = ex[0]
 
         # remove brackets in "ab(ab)" expressions
-        if is_operator(ex[0]) and ex[0] != '~':
+        if is_operator(ex[0]) and not is_unary_operator(ex[0]):
             for j in ex:
                 lits.insert(i, j)
                 i += 1
@@ -122,14 +108,30 @@ def formula(s):
 
             i += 1
 
+    def autoconjuction(lits):
+        i = 0
+        while i < len(lits):
+            if lits[i].__class__ is list:
+                lits[i] = autoconjuction(lits[i])
+            if i < len(lits) - 1:
+                if (lits[i].__class__ is list or is_operand(lits[i])) and \
+                   (lits[i+1].__class__ is list or is_operand(lits[i+1])):
+                    lits = lits[:i+1] + ['&'] + lits[i+1:]
+            i += 1
+        return lits
+
     i = 0
     while i < len(lits):
         if lits[i] == '(':
             expr(lits, i, operands)
         i += 1
 
-    # fix priority (& — before everything, + before -> and <->)
     quote_unary(lits, '~')
+
+    # replace abc(a+b) with a&b&c&(a+b)
+    lits = autoconjuction(lits)
+
+    # fix priority (& — before everything, + before -> and <->)
     for i in ('|', '_', '&', '+', '*', '->', '<->'):
         quote_binary(lits, i)
 
