@@ -225,7 +225,7 @@ def binary_action(f, ff, op_dict, n):
         calc_binary(f, ff, op_dict, n, lambda x, y: int(x == y))
     elif f[1] == '|':  # NAND gate, Sheffer's line
         calc_binary(f, ff, op_dict, n, lambda x, y: int(not(x and y)))
-    elif f[1] == '_':  # Logical NOR (Pirce's arrow, Lukachevich's line)
+    elif f[1] == '_':  # Logical NOR (Pirce's arrow, Lukasevich's line)
         calc_binary(f, ff, op_dict, n, lambda x, y: int(not(x or y)))
     elif f[1] == '*':  # XOR
         calc_binary(f, ff, op_dict, n, lambda x, y: int(x ^ y))
