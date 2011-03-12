@@ -11,6 +11,7 @@
 
 import sys 
 import re
+from copy import copy
 
 lits_r = re.compile(r'([a-zA-Z01]|[~&+|_*()]|<->|->)')
 MAX_SYMBOLS = 1000
@@ -56,29 +57,33 @@ def formula(s):
         if is_operand(i) and not is_const(i) and not operands.__contains__(i):
             operands.append(i)
 
-    def expr(lits, i, operands): 
-        lits.pop(i)  # removing (
-        ex = []
-        j = i
-        while j < len(lits) and not lits[j] == ')':
-            if lits[j] != '(':
-                ex.append(lits.pop(j))
-            else:
-                expr(lits, j, operands)
-        if lits[j] == ')':
-            lits.pop(j)  # removing )
+    def expr(lits):
+        if '(' not in lits or ')' not in lits:
+            return lits
 
-        # remove unnecessary brackets
-        if len(ex) == 1:
-            ex = ex[0]
+        br = []
+        i = 0
+        while i < len(lits):
+            if lits[i] == '(':
+                br.append((lits[i], i))  # bracket and opening offset
+            elif lits[i] == ')':
+                start = br.pop()[1]
+                ex = lits[start+1:i]
+                ex = expr(ex)  # processing subexpression
 
-        # remove brackets in "ab(ab)" expressions
-        if is_operator(ex[0]) and not is_unary_operator(ex[0]):
-            for j in ex:
-                lits.insert(i, j)
-                i += 1
-        else:
-            lits.insert(i, ex)
+                # remove unnecessary brackets
+                if len(ex) == 1:
+                    ex = ex[0]
+
+                # remove old literals' items
+                for k in range(i-start+1):
+                    lits.pop(start)
+
+                lits.insert(start, ex)
+                i = start
+            i += 1
+
+        return lits
 
     def quote_unary(lits, operator):
         i = 0
@@ -119,12 +124,7 @@ def formula(s):
             i += 1
         return lits
 
-    i = 0
-    while i < len(lits):
-        if lits[i] == '(':
-            expr(lits, i, operands)
-        i += 1
-
+    lits = expr(lits)
     quote_unary(lits, '~')
 
     # replace abc(a+b) with a&b&c&(a+b)
