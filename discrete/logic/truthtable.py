@@ -139,7 +139,7 @@ def formula(s):
     return lits, operands
 
 def make_table(f, operands, startwith = 1):
-    table = [operands]
+    table = [copy(operands)]
     op_dict = {}
     leno = len(operands)
     lines = 2 ** leno
@@ -270,7 +270,19 @@ def identic(table):
     else:
         return 'Expression is not identical'
 
-def pprint(table, html=True):
+def dnf(table, operands):
+    n = len(table)
+    m = len(table[0])-1
+    on = len(operands)
+    s = ''
+    for i in range(1, n):
+        if table[i][m]:
+            for j in range(on):
+                s += (table[i][j] and operands[j]) or '~' + operands[j]
+            s += '+'
+    return s[:len(s)-1]  # do not return last +
+
+def pprint(table, operands, html=True):
     if html:
         print('<table border="1">')
     for i in range(len(table)):
@@ -293,6 +305,13 @@ onMouseOut="this.className='normal'">''')
     if html:
         print('</table>')
 
+    print(identic(table))
+
+    if html:
+        print('<br />')
+
+    print('DNF is', dnf(table, operands))
+
 def main(argv):
     if len(argv) < 2:
         print('usage: %s \'x & ~y -> (y + ~x -> ~z)\' [1 | 0] [html | ascii]' \
@@ -308,8 +327,7 @@ def main(argv):
         html = len(argv) > 3 and argv[3] == 'html'
 
         table = make_table(f, operands, startwith)
-        pprint(table, html)
-        print(identic(table))
+        pprint(table, operands, html)
     except Exception as text:
         print('Input error. Check your input expression. More info: %s' % text)
         return 1
