@@ -40,7 +40,11 @@ def brackets_ok(s):
     return len(br) == 0
 
 def fix_input(s):
-    s = s.replace(' ', '').replace('~~', '').replace('\r','').replace('\n', '')
+    s = s.replace(' ', '') \
+         .replace('~~', '') \
+         .replace('\r','') \
+         .replace('\n', '') \
+         .replace('\t', '')
     if len(s) > MAX_SYMBOLS:
         raise Exception('input line is too long')
 
