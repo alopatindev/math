@@ -286,6 +286,20 @@ def dnf(table, operands):
             s += '+'
     return s[:len(s)-1]  # do not return last +
 
+def cnf(table, operands):
+    n = len(table)
+    m = len(table[0])-1
+    on = len(operands)
+    s = ''
+    for i in range(1, n):
+        if not table[i][m]:
+            s += '('
+            for j in range(on):
+                s += (table[i][j] and operands[j]) or '~' + operands[j]
+                s += '+'
+            s = s[:len(s)-1] + ')'
+    return s
+
 def pprint(table, operands, html=True):
     if html:
         print('<table border="1">')
@@ -314,7 +328,12 @@ onMouseOut="this.className='normal'">''')
     if html:
         print('<br />')
 
-    print('DNF is', dnf(table, operands))
+    print('Complete DNF is', dnf(table, operands))
+
+    if html:
+        print('<br />')
+
+    print('Complete CNF is', cnf(table, operands))
 
 def main(argv):
     if len(argv) < 2:
