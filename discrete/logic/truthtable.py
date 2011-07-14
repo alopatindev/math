@@ -216,8 +216,6 @@ def calc_binary(f, ff, op_dict, n, op):
 
 def binary_action(f, ff, op_dict, n):
     op_dict[ff] = []
-    if len(f) < 2:
-        print("wtf", f, ff)
 
     if f[1] == '&':
         calc_binary(f, ff, op_dict, n, lambda x, y: int(x and y))
