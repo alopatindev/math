@@ -281,8 +281,8 @@ def dnf(table, operands):
         if table[i][m]:
             for j in range(on):
                 s += (table[i][j] and operands[j]) or '~' + operands[j]
-            s += '+'
-    return s[:len(s)-1]  # do not return last +
+            s += ' + '
+    return s[:len(s)-3]  # do not return last +
 
 def cnf(table, operands):
     n = len(table)
@@ -293,7 +293,7 @@ def cnf(table, operands):
         if not table[i][m]:
             s += '('
             for j in range(on):
-                s += (table[i][j] and operands[j]) or '~' + operands[j]
+                s += (not table[i][j] and operands[j]) or '~' + operands[j]
                 s += '+'
             s = s[:len(s)-1] + ')'
     return s
