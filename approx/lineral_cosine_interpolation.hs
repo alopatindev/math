@@ -30,8 +30,8 @@ interpolateY ys dot_i smooth mu = [
         | i <- [1 .. smooth - 1]
     ]
 
-alldots_x = glue [[byIndex xs dot_i] ++ interpolateX xs dot_i smooth | dot_i <- [0..2]]
-alldots_y = glue [[byIndex ys dot_i] ++ interpolateY ys dot_i smooth mu | dot_i <- [0..2]]
+alldots_x = glue [[byIndex xs dot_i] ++ interpolateX xs dot_i smooth | dot_i <- [0..2]] ++ [last xs]
+alldots_y = glue [[byIndex ys dot_i] ++ interpolateY ys dot_i smooth mu | dot_i <- [0..2]] ++ [last ys]
 
 alldots = [(byIndex alldots_x i, byIndex alldots_y i) | i <- [0 .. (length alldots_x) - 1]]
 
