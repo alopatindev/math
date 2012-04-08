@@ -35,6 +35,6 @@ interpolateY ys dot_i smooth = [
 alldots_x = glue [[byIndex xs dot_i] ++ interpolateX xs dot_i smooth | dot_i <- [0..2]] ++ [last xs]
 alldots_y = glue [[byIndex ys dot_i] ++ interpolateY ys dot_i smooth | dot_i <- [0..2]] ++ [last ys]
 
-alldots = [(byIndex alldots_x i, byIndex alldots_y i) | i <- [0 .. (length alldots_x) - 1]]
+alldots = zip alldots_x alldots_y
 
 main = print alldots
