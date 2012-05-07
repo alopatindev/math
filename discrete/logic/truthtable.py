@@ -13,7 +13,7 @@ import sys
 import re
 from copy import copy
 
-lits_r = re.compile(r'([a-zA-Z01]|[~&+|_*()]|<->|->)')
+lits_r = re.compile(r'([a-zA-Z01]|[~&+|_*()]|<->|@|->)')
 MAX_SYMBOLS = 1000
 
 def is_const(x):
@@ -42,6 +42,7 @@ def brackets_ok(s):
 def fix_input(s):
     s = s.replace(' ', '') \
          .replace('~~', '') \
+         .replace('@', '<->') \
          .replace('\r','') \
          .replace('\n', '') \
          .replace('\t', '')

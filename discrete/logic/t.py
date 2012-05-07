@@ -48,7 +48,7 @@ if __name__ == '__main__':
 & - conjuction (logical multiply)<br/>
 + - disjunction (logical addition)<br/>
 -> - implication (if/then)<br/>
-<-> - equivalence (equality)<br/>
+<-> (or @) - equivalence (equality)<br/>
 | - NAND gate (Sheffer\'s line)<br/>
 _ - logical NOR (Pirce\'s arrow, Lukasevich\'s line)<br/>
 * - XOR operator (exclusive or).<br/>
