@@ -302,15 +302,16 @@ def cnf(table, operands):
 
 def resolution_checksum(table):
     try:
-        b = b''
+        s = ''
         r = len(table);
         c = len(table[0]) - 1
         for i in range(1, r):
-            b += bytes(table[i][c], 'utf-8')
+            s += str(table[i][c])
 
+        b = bytes(s, 'utf-8')
         m = md5()
         m.update(b)
-        return m.hexdigest()
+        return '(%s) %s' % (s, m.hexdigest())
     except:
         return 'Not supported'
 
