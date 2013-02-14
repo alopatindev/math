@@ -12,6 +12,7 @@
 import sys 
 import re
 from copy import copy
+from hashlib import md5
 
 lits_r = re.compile(r'([a-zA-Z01]|[~&+|_*()]|<->|@|->)')
 MAX_SYMBOLS = 1000
@@ -299,6 +300,20 @@ def cnf(table, operands):
             s = s[:len(s)-1] + ')'
     return s
 
+def resolution_checksum(table):
+    try:
+        b = b''
+        r = len(table);
+        c = len(table[0]) - 1
+        for i in range(1, r):
+            b += bytes(table[i][c], 'utf-8')
+
+        m = md5()
+        m.update(b)
+        return m.hexdigest()
+    except:
+        return 'Not supported'
+
 def pprint(table, operands, html=True):
     if html:
         print('<table border="1">')
@@ -333,6 +348,11 @@ onMouseOut="this.className='normal'">''')
         print('<br />')
 
     print('Complete CNF is', cnf(table, operands))
+
+    if html:
+        print('<br />')
+
+    print('Resolution checksum:', resolution_checksum(table))
 
 def main(argv):
     if len(argv) < 2:
