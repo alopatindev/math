@@ -17,16 +17,12 @@ def make_zero(a, b, i, j):
     n = len(a)
     m = len(a[0])
 
-    for k in range(n):
-        if k != i and a[k][j] == 1:
-            break
-
     d = a[i][j]
 
     for l in range(m):
-        a[i][l] -= a[k][l]*d
+        a[i][l] -= a[j][l]*d
 
-    b[i] -= b[k]*d
+    b[i] -= b[j]*d
 
     return a, b
 
@@ -71,3 +67,4 @@ if __name__ == "__main__":
     a, b = input_data(sys.argv)
     a, b = solve(a, b)
     print(b)
+    assert(b == [0.5, -0.5, 0.0])
