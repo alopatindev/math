@@ -87,4 +87,3 @@ if __name__ == "__main__":
     a, b = input_data(sys.argv)
     a_solved, b_solved = solve((a, b, len(b)))
     print(b_solved)
-    assert(b_solved == [0.5, -0.5, 0.0])

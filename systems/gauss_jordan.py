@@ -67,4 +67,3 @@ if __name__ == "__main__":
     a, b = input_data(sys.argv)
     a, b = solve(a, b)
     print(b)
-    assert(b == [0.5, -0.5, 0.0])
