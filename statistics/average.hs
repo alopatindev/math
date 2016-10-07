@@ -1,5 +1,7 @@
 import Data.List
 import Data.List.Split
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Test.HUnit
 
 mean :: [Double] -> Double
@@ -47,6 +49,22 @@ medianOfMedians xs =
         where
             ys = map median xss
             xss = splitEvery 5 xs
+
+mode :: [Double] -> Double
+mode xs = helper xs (head xs) (Map.empty) where
+    helper :: [Double] -> Double -> Map Double Int -> Double
+    helper [] mostFrequentX _ = mostFrequentX
+    helper (x:xs) mostFrequentX xToCount = helper xs mostFrequentX' xToCount' where
+        mostFrequentX' =
+            if Map.lookup x xToCount' > mostFrequentCount
+            then x
+            else mostFrequentX
+        mostFrequentCount = Map.lookup mostFrequentX xToCount'
+        xToCount' = Map.insert x count' xToCount
+        count' =
+            case (Map.lookup x xToCount) of
+                Just count -> count + 1
+                Nothing -> 0
 
 -- helpers
 
@@ -100,6 +118,10 @@ medianTests = TestList [TestLabel "median of list with even length" testMedianEv
                         TestLabel "median of medians" testMedianOfMedians,
                         TestLabel "median of medians large input" testMedianOfMediansLargeInput]
 
+modeTest :: Test
+modeTest = TestCase (assertEqualFrac 2 (mode [2, 9, 2, 3, 4, 1, 7]))
+
 main :: IO Counts
 main = do _ <- runTestTT meanTests
           runTestTT medianTests
+          runTestTT modeTest
