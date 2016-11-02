@@ -18,37 +18,47 @@ harmonicMean xs = n * (sum' ** (-1)) where
     n = length' xs
     sum' = sum $ map (\x -> 1 / x) xs
 
+selectFive :: [Double] -> Int -> Double
+selectFive xs k = head right where
+    right = drop k sorted
+    sorted = sort xs
+
+select :: [Double] -> Int -> Double
+select xs k
+    | n <= threshold = selectFive xs k
+    | k < lessN = select less k
+    | k == lessN = pivot
+    | otherwise = select greater (k - lessN - 1)
+    where
+        lessN = length less
+        less = [x | x <- xs, x < pivot]
+        greater = [x | x <- xs, x > pivot]
+        pivot = medianOfMedians ys
+        ys = map median xss
+        xss = splitEvery threshold xs
+        n = length xs
+        threshold = 5
+
 median :: [Double] -> Double
 median xs =
     if evenLength
     then medianEven xs
-    else medianOdd xs
+    else selectFive xs half
     where
         evenLength = n `mod` 2 == 0
         n = length xs
+        half = n `div` 2
 
         medianEven :: [Double] -> Double
         medianEven xs = mean middle where
             middle = take 2 rightHalf
-            rightHalf = drop half sorted
-            half = n `div` 2 - 1
+            rightHalf = drop (half - 1) sorted
             sorted = sort xs
-            n = length xs
-
-        medianOdd :: [Double] -> Double
-        medianOdd xs = head rightHalf where
-            rightHalf = drop half sorted
-            half = n `div` 2
-            sorted = sort xs
-            n = length xs
 
 medianOfMedians :: [Double] -> Double
-medianOfMedians xs =
-    if length xs < 6 then median xs
-    else medianOfMedians ys
-        where
-            ys = map median xss
-            xss = splitEvery 5 xs
+medianOfMedians xs = select xs half where
+    n = length xs
+    half = n `div` 2
 
 mode :: [Double] -> Double
 mode xs = helper xs (head xs) (Map.empty) where
@@ -106,16 +116,20 @@ testMedianOdd = TestCase (assertEqualFrac 45 (median xs))
 testMedianEven :: Test
 testMedianEven = TestCase (assertEqualFrac 43 (median $ tail xs))
 
-testMedianOfMedians :: Test
-testMedianOfMedians = TestCase (assertEqualFrac 45 (medianOfMedians xs))
+testMedianOfMedians1 :: Test
+testMedianOfMedians1 = TestCase (assertEqualFrac 45 (medianOfMedians xs))
+
+testMedianOfMedians2 :: Test
+testMedianOfMedians2 = TestCase (assertEqualFrac 4 (medianOfMedians [1..6]))
 
 testMedianOfMediansLargeInput :: Test
-testMedianOfMediansLargeInput = TestCase (assertEqualFrac 54 (medianOfMedians largeXs))
+testMedianOfMediansLargeInput = TestCase (assertEqualFrac 56 (medianOfMedians largeXs))
 
 medianTests :: Test
 medianTests = TestList [TestLabel "median of list with even length" testMedianEven,
                         TestLabel "median of list with odd length" testMedianOdd,
-                        TestLabel "median of medians" testMedianOfMedians,
+                        TestLabel "median of medians 1" testMedianOfMedians1,
+                        TestLabel "median of medians 2" testMedianOfMedians2,
                         TestLabel "median of medians large input" testMedianOfMediansLargeInput]
 
 modeTest :: Test
