@@ -18,27 +18,6 @@ harmonicMean xs = n * (sum' ** (-1)) where
     n = length' xs
     sum' = sum $ map (\x -> 1 / x) xs
 
-selectFive :: [Double] -> Int -> Double
-selectFive xs k = head right where
-    right = drop k sorted
-    sorted = sort xs
-
-select :: [Double] -> Int -> Double
-select xs k
-    | n <= threshold = selectFive xs k
-    | k < lessN = select less k
-    | k == lessN = pivot
-    | otherwise = select greater (k - lessN - 1)
-    where
-        lessN = length less
-        less = [x | x <- xs, x < pivot]
-        greater = [x | x <- xs, x > pivot]
-        pivot = medianOfMedians ys
-        ys = map median xss
-        xss = splitEvery threshold xs
-        n = length xs
-        threshold = 5
-
 median :: [Double] -> Double
 median xs =
     if evenLength
@@ -64,32 +43,54 @@ mode :: [Double] -> Double
 mode xs = helper xs (head xs) (Map.empty) where
     helper :: [Double] -> Double -> Map Double Int -> Double
     helper [] mostFrequentX _ = mostFrequentX
-    helper (x:xs) mostFrequentX xToCount = helper xs mostFrequentX' xToCount' where
-        mostFrequentX' =
-            if Map.lookup x xToCount' > mostFrequentCount
-            then x
-            else mostFrequentX
-        mostFrequentCount = Map.lookup mostFrequentX xToCount'
-        xToCount' = Map.insert x count' xToCount
-        count' =
-            case (Map.lookup x xToCount) of
-                Just count -> count + 1
-                Nothing -> 0
+    helper (x:xs) mostFrequentX counters =
+        helper xs mostFrequentX' counters' where
+            mostFrequentX' =
+                if Map.lookup x counters' > mostFrequentCount
+                then x
+                else mostFrequentX
+            mostFrequentCount = Map.lookup mostFrequentX counters'
+            counters' = Map.insert x count' counters
+            count' =
+                case (Map.lookup x counters) of
+                    Just count -> count + 1
+                    Nothing -> 0
 
 -- helpers
+
+selectFive :: [Double] -> Int -> Double
+selectFive xs k = head right where
+    right = drop k sorted
+    sorted = sort xs
+
+select :: [Double] -> Int -> Double
+select xs k
+    | n <= threshold = selectFive xs k
+    | k < lessN = select less k
+    | k == lessN = pivot
+    | otherwise = select greater (k - lessN - 1)
+    where
+        lessN = length less
+        less = [x | x <- xs, x < pivot]
+        greater = [x | x <- xs, x > pivot]
+        pivot = medianOfMedians ys
+        ys = map median xss
+        xss = splitEvery threshold xs
+        n = length xs
+        threshold = 5
 
 length' :: [a] -> Double
 length' xs = fromIntegral $ length xs
 
 assertEqualFrac :: (Fractional a, Eq a, Ord a, Show a) => a -> a -> Assertion
-assertEqualFrac expect value = do _ <- putStr text
-                                  assert eq
-    where
-        text = if eq
-               then ""
-               else "\n" ++ (show expect) ++ "!=" ++ (show value) ++ "\n"
-        eq = (abs (expect - value)) < epsilon
-        epsilon = 0.0001
+assertEqualFrac expect value =
+    do _ <- putStr text
+       assert eq where
+           text = if eq
+                  then ""
+                  else "\n" ++ (show expect) ++ "!=" ++ (show value) ++ "\n"
+           eq = (abs (expect - value)) < epsilon
+           epsilon = 0.0001
 
 -- tests
 
