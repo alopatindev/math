@@ -1,19 +1,21 @@
 object Combinatorics extends App {
 
+  type List2D[A] = List[List[Int]]
+
   // Cartesian Product
   // n * m
   // list(itertools.product([1, 2, 3], [4, 5])) == [(1, 4), (1, 5), (2, 4), (2, 5), (3, 4), (3, 5)]
-  def cartesianProduct(xs: List[List[Int]], ys: List[List[Int]]): List[List[Int]] =
+  def cartesianProduct(xs: List2D[Int], ys: List2D[Int]): List2D[Int] =
     for (x <- xs; y <- ys) yield x ++ y
 
   // Permutations (WITHOUT Replacement), Distinct Permutations
   // (n choose k) * k! = n! / (n - k)!
   // list(itertools.permutations([1, 2, 3], 2)) == [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
-  def permutations(xs: List[Int], k: Int): List[List[Int]] = {
+  def permutations(xs: List[Int], k: Int): List2D[Int] = {
     val n = xs.length
     val indexes = (0 until n).toList
 
-    def generateIndexes(k: Int): List[List[Int]] =
+    def generateIndexes(k: Int): List2D[Int] =
       if (k <= 0) List(List())
       else if (k == 1) indexes.map { List(_) }
       else if (k == 2)
@@ -36,29 +38,23 @@ object Combinatorics extends App {
 
   // Permutations WITH Replacement
   // n^k
-  // permutations_with_replacement([1, 2, 3], 2)) == [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)]
-  def permutationsWithReplacement(xs: List[Int], k: Int): List[List[Int]] = {
-    val xss = xs.map { List(_) }
-
-    def helper(acc: List[List[Int]], k: Int): List[List[Int]] =
-      if (k <= 0) List(List())
-      else if (k == 1) acc
-      else {
-        val newAcc = cartesianProduct(acc, xss)
-        helper(newAcc, k - 1)
-      }
-
-    helper(xss, k)
-  }
+  // permutations_with_replacement = lambda xs, n: itertools.product(xs, repeat=n)
+  // list(permutations_with_replacement([1, 2, 3], 2)) == [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)]
+  def permutationsWithReplacement(xs: List[Int], k: Int): List2D[Int] =
+    if (k <= 0) List(List())
+    else {
+      val xss = xs.map { List(_) }
+      (1 until k).foldLeft(xss) { (acc: List2D[Int], _) => cartesianProduct(acc, xss) }
+    }
 
   // Combinations (WITHOUT Replacement)
   // (n choose k)
   // list(itertools.combinations([1, 2, 3], 2)) == [(1, 2), (1, 3), (2, 3)]
-  def combinations(xs: List[Int], k: Int): List[List[Int]] =
+  def combinations(xs: List[Int], k: Int): List2D[Int] =
     if (k <= 0) List(List())
     else if (k == 1) xs.map { List(_) }
     else {
-      def helper(xs: List[Int], acc: List[List[Int]]): List[List[Int]] = xs match {
+      def helper(xs: List[Int], acc: List2D[Int]): List2D[Int] = xs match {
         case x :: tail =>
           val newAcc = acc ++ combinations(tail, k - 1).map { comb => x :: comb }
           helper(tail, newAcc)
@@ -71,11 +67,11 @@ object Combinatorics extends App {
   // (n + k - 1 choose k)
   // list(itertools.combinations_with_replacement([1, 2, 3], 2)) == [(1, 1), (1, 2), (1, 3), (2, 2), (2, 3), (3, 3)]
   // list(itertools.combinations_with_replacement([1, 2, 3], 3)) == [(1, 1, 1), (1, 1, 2), (1, 1, 3), (1, 2, 2), (1, 2, 3), (1, 3, 3), (2, 2, 2), (2, 2, 3), (2, 3, 3), (3, 3, 3)]
-  def combinationsWithReplacement(xs: List[Int], k: Int): List[List[Int]] =
-    if (k <= 0) List()
+  def combinationsWithReplacement(xs: List[Int], k: Int): List2D[Int] =
+    if (k <= 0) List(List())
     else if (k == 1) xs.map { List(_) }
     else {
-      def helper(xs: List[Int], acc: List[List[Int]]): List[List[Int]] = xs match {
+      def helper(xs: List[Int], acc: List2D[Int]): List2D[Int] = xs match {
         case x :: tail =>
           val replacement = (0 until k).map { _ => x }.toList
           val newAcc = acc ++ combinationsWithReplacement(xs, k - 1).map { comb => x :: comb }
@@ -107,8 +103,8 @@ object Combinatorics extends App {
     assert(combinations(List(1, 2, 3), 3) == List(List(1, 2, 3)))
     assert(combinations(List(1, 2, 3, 4), 3) == List(List(1, 2, 3), List(1, 2, 4), List(1, 3, 4), List(2, 3, 4)))
 
-    assert(permutationsWithReplacement(List(1, 2, 3), 0) == List(List()))
-    assert(permutationsWithReplacement(List(1, 2, 3), 1) == List(List(1), List(2), List(3)))
+    assert(combinationsWithReplacement(List(1, 2, 3), 0) == List(List()))
+    assert(combinationsWithReplacement(List(1, 2, 3), 1) == List(List(1), List(2), List(3)))
     assert(combinationsWithReplacement(List(1, 2, 3), 2) == List(List(1, 1), List(1, 2), List(1, 3), List(2, 2), List(2, 3), List(3, 3)))
     assert(combinationsWithReplacement(List(1, 2, 3), 3) == List(List(1, 1, 1), List(1, 1, 2), List(1, 1, 3), List(1, 2, 2), List(1, 2, 3), List(1, 3, 3), List(2, 2, 2), List(2, 2, 3), List(2, 3, 3), List(3, 3, 3)))
     assert(combinationsWithReplacement(List(1, 2, 3, 4), 3) == List(List(1, 1, 1), List(1, 1, 2), List(1, 1, 3), List(1, 1, 4), List(1, 2, 2), List(1, 2, 3), List(1, 2, 4), List(1, 3, 3), List(1, 3, 4), List(1, 4, 4), List(2, 2, 2), List(2, 2, 3), List(2, 2, 4), List(2, 3, 3), List(2, 3, 4), List(2, 4, 4), List(3, 3, 3), List(3, 3, 4), List(3, 4, 4), List(4, 4, 4)))
